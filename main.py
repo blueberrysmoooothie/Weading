@@ -15,8 +15,11 @@ def save_data(data):
 
 st.title('결혼식 축의금 관리')
 name = st.text_input("이름 : ")
-kind_item = st.radio('관계 측',('신부', '신랑', '부모님'))
-relation_item = st.radio('관계',('가족', '직장', '친구', '기타'))
+col1, col2 = st.columns(2)
+with col1: 
+    kind_item = st.radio('관계 측',('신부', '신랑', '부모님','기타'))
+with col2: 
+    relation_item = st.radio('관계',('가족', '직장', '친구', '기타'))
 
 money = int(st.text_input('금액 (천원) : ',value="50"))
 people = int(st.slider('인원 : ',1,10, 2))
