@@ -22,8 +22,8 @@ with col2:
     relation_item = st.radio('관계',('가족', '직장', '친구', '기타'))
 
 money = int(st.text_input('금액 (천원) : ',value="50"))
-people = int(st.slider('인원 : ',1,10, 2))
-tiket = int(st.slider('식권 : ',1,10, 2))
+people = int(st.slider('인원 : ',0,10, 2))
+tiket = int(st.slider('식권 : ',0,10, 2))
 sub_ = st.text_input('기타 : ',value=" ")
 c_time = st.text_input('입력시간 : ',value=str(dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
 button_pushed = st.button('저장')
