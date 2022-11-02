@@ -41,6 +41,6 @@ if button_pushed:
 st.dataframe(data)
 st.download_button('다운로드',data,'./축의금.csv')
 
-cam = st.camera_input(label='test_input',disabled=False)
-if cam:
-    st.image(cam)
+# cam = st.camera_input(label='test_input',disabled=False)
+# if cam:
+#     st.image(cam)
