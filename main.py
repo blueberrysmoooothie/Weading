@@ -25,7 +25,7 @@ money = int(st.text_input('금액 (천원) : ',value="50"))
 people = int(st.slider('인원 : ',0,10, 2))
 tiket = int(st.slider('식권 : ',0,10, 2))
 sub_ = st.text_input('기타 : ',value=" ")
-c_time = st.text_input('입력시간 : ',value=str(dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
+c_time = st.text_input('입력시간 : ',value=str(dt.datetime.now().strftime('%m-%d %H시 %M분 %S초')))
 button_pushed = st.button('저장')
 
 data = load_data()
