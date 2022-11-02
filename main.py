@@ -37,3 +37,8 @@ if button_pushed:
         st.text(str(sum(data['금액 (천원)']))+ ' 천원')
 
 st.dataframe(data)
+
+
+cam = st.camera_input(label='test_input',disabled=False)
+if cam:
+    st.image(cam)
