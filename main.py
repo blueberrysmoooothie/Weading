@@ -3,15 +3,18 @@ import streamlit as st
 import pandas as pd
 import datetime as dt
 
-
 def load_data():
     try:
         data = pd.read_csv('./축의금.csv')
     except:
         data = pd.DataFrame(columns = ['이름','관계 측','관계','금액 (천원)', '인원','식권','기타','입력시간'])
     return data
+
 def save_data(data):
     data.to_csv('./축의금.csv', index = False)
+
+def convert_df(df):
+    return df.to_csv().encode('euc-kr')
 
 
 
@@ -23,10 +26,10 @@ with col1:
 with col2: 
     relation_item = st.radio('관계',('가족', '직장', '친구', '기타'))
 
-money = int(st.text_input('금액 (천원) : ',value="50"))
+money = int(st.text_input('금액 (만원) : ',value="5"))
 people = int(st.slider('인원 : ',0,10, 2))
 tiket = int(st.slider('식권 : ',0,10, 2))
-sub_ = st.text_input('기타 : ',value=" ")
+sub_ = st.text_input('기타 : ',value="-")
 c_time = st.text_input('입력시간 : ',value=str(dt.datetime.now().strftime('%m-%d %H시 %M분 %S초')))
 button_pushed = st.button('저장')
 
@@ -36,10 +39,13 @@ if button_pushed:
     if name != '':
         data.loc[len(data)] = [name, kind_item, relation_item, money, people, tiket,sub_,c_time]
         save_data(data)
-        st.text(str(sum(data['금액 (천원)']))+ ' 천원')
+        st.text(str(sum(data['금액 (만원)']))+ ' 만원')
 
 st.dataframe(data)
-st.download_button('다운로드',data,'./축의금.csv')
+
+if len(data):
+    csv = convert_df(data)
+    st.download_button('다운로드',csv, file_name = 'weading.csv', mime = 'text/csv')
 
 # cam = st.camera_input(label='test_input',disabled=False)
 # if cam:
