@@ -1,4 +1,4 @@
-
+pip install gspread
 import streamlit as st
 import pandas as pd
 import datetime as dt
