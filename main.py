@@ -2,11 +2,9 @@
 import streamlit as st
 import pandas as pd
 import datetime as dt
-from gsheetsdb import connect
+# from gsheetsdb import connect
 from google.oauth2 import service_account
-from oauth2client.service_account import ServiceAccountCredentials
 import gspread
-import json
 
 
 credentials = service_account.Credentials.from_service_account_info(
@@ -20,12 +18,12 @@ credentials = service_account.Credentials.from_service_account_info(
 gc = gspread.authorize(credentials)
 gc1 = gc.open("축의금").worksheet('축의금')
 
-def run_query(query):
-    conn = connect(credentials=credentials)
-    rows = conn.execute(query, headers = 1)
-    rows = rows.fetchall()
-    conn.close()
-    return rows
+# def run_query(query):
+#     conn = connect(credentials=credentials)
+#     rows = conn.execute(query, headers = 1)
+#     rows = rows.fetchall()
+#     conn.close()
+#     return rows
 
 def load_data():
     #sheet_url = st.secrets["private_gsheets_url"]
