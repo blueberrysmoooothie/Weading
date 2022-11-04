@@ -1,24 +1,44 @@
 
-from re import sub
 import streamlit as st
 import pandas as pd
 import datetime as dt
 from gsheetsdb import connect
+from google.oauth2 import service_account
+from oauth2client.service_account import ServiceAccountCredentials
+import gspread
+import json
+
+
+credentials = service_account.Credentials.from_service_account_info(
+    st.secrets["gcp_service_account"],
+    scopes=[
+        "https://www.googleapis.com/auth/spreadsheets",
+        'https://spreadsheets.google.com/feeds',
+        'https://www.googleapis.com/auth/drive'
+    ],
+)
+gc = gspread.authorize(credentials)
+gc1 = gc.open("축의금").worksheet('축의금')
 
 def run_query(query):
-    conn = connect()
-    rows = conn.excute(query, hearders = 1)
+    conn = connect(credentials=credentials)
+    rows = conn.execute(query, headers = 1)
     rows = rows.fetchall()
     conn.close()
     return rows
 
-@st.cache(ttl=600)
 def load_data():
-    sheet_url = st.secrets["public_gsheets_url"]
-    rows = run_query(f'SELECT * FROM "{sheet_url}"')
-    data = pd.DataFrame(columns = ['이름','관계측','관계','금액', '인원','식권','기타','입력시간'])
-    for row in rows:
-        data.loc[len(data)] = [row.이름,row.관계측, row.관계,row.금액, row.인원,row.식권,row.기타,row.입력시간]
+    #sheet_url = st.secrets["private_gsheets_url"]
+    #rows = run_query(f'SELECT * FROM "{sheet_url}"')
+    #data = pd.DataFrame(columns = ['이름','관계측','관계','금액', '인원','식권','기타','입력시간'])
+    #for row in rows:
+    #    data.loc[len(data)] = [row.이름,row.관계측, row.관계,row.금액, row.인원,row.식권,row.기타,row.입력시간]
+    gc2 = gc1.get_all_values()
+    try:
+        data =pd.DataFrame(gc2[1:], columns=gc2[0])
+    except:
+        data =pd.DataFrame(gc2, columns=gc2[0])
+        data = data.reindex(data.index.drop(0))
 
 
 #    try:
@@ -29,10 +49,15 @@ def load_data():
     return data
 
 
-def save_data(data):
-    sheet_url = st.secrets["public_gsheets_url"]
-    sql = f'INSERT INTO :{sheet_url}" VALUES({name}, {kind_item}, {relation_item}, {money}, {people}, {tiket},{sub_,c_time})'
-    run_query(sql)
+def save_data(data,name, kind_item, relation_item, money, people, tiket,sub_,c_time):
+
+    #sheet_url = st.secrets["public_gsheets_url"]
+#    sql = f'INSERT INTO "{sheet_url}" VALUES({name}, {kind_item}, {relation_item}, {money}, {people}, {tiket},{sub_,c_time})'
+#    run_query(sql)
+
+    gc1.append_row([name, kind_item, relation_item, money, people, tiket,sub_,c_time])
+
+
     data.to_csv('./축의금.csv', index = False,encoding = 'euc-kr')
 
 def convert_df(df):
@@ -64,11 +89,15 @@ data = load_data()
 if button_pushed:
     # print([name, kind_item, relation_item, money, people, tiket,sub_,c_time])
     if name != '':
-        data.loc[len(data)] = [name, kind_item, relation_item, money, people, tiket,sub_,c_time]
+        #data.loc[len(data)] = [name, kind_item, relation_item, money, people, tiket,sub_,c_time]
         save_data(data,name, kind_item, relation_item, money, people, tiket,sub_,c_time)
+        data = load_data()
         save_log(tag = 'add',name=name, c_time=c_time)
 
-        st.text(str(sum(data['금액 (만원)']))+ ' 만원')
+        #print(data['금액'])
+
+mon = data['금액']
+st.text(f"총합 : {sum([int(m) for m in mon])} 만원")
 
 st.dataframe(data)
 
