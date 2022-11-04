@@ -3,17 +3,36 @@ from re import sub
 import streamlit as st
 import pandas as pd
 import datetime as dt
+from gsheetsdb import connect
 
+def run_query(query):
+    conn = connect()
+    rows = conn.excute(query, hearders = 1)
+    rows = rows.fetchall()
+    conn.close()
+    return rows
 
+@st.cache(ttl=600)
 def load_data():
-    try:
-        data = pd.read_csv('./축의금.csv', encoding = 'euc-kr')
-    except:
-        data = pd.DataFrame(columns = ['이름','관계 측','관계','금액 (만원)', '인원','식권','기타','입력시간'])
+    sheet_url = st.secrets["public_gsheets_url"]
+    rows = run_query(f'SELECT * FROM "{sheet_url}"')
+    data = pd.DataFrame(columns = ['이름','관계측','관계','금액', '인원','식권','기타','입력시간'])
+    for row in rows:
+        data.loc[len(data)] = [row.이름,row.관계측, row.관계,row.금액, row.인원,row.식권,row.기타,row.입력시간]
+
+
+#    try:
+#        localdata = pd.read_csv('./축의금.csv', encoding = 'euc-kr')
+#    except:
+#        localdata = pd.DataFrame(columns = ['이름','관계측','관계','금액', '인원','식권','기타','입력시간'])
     
     return data
 
+
 def save_data(data):
+    sheet_url = st.secrets["public_gsheets_url"]
+    sql = f'INSERT INTO :{sheet_url}" VALUES({name}, {kind_item}, {relation_item}, {money}, {people}, {tiket},{sub_,c_time})'
+    run_query(sql)
     data.to_csv('./축의금.csv', index = False,encoding = 'euc-kr')
 
 def convert_df(df):
@@ -46,7 +65,7 @@ if button_pushed:
     # print([name, kind_item, relation_item, money, people, tiket,sub_,c_time])
     if name != '':
         data.loc[len(data)] = [name, kind_item, relation_item, money, people, tiket,sub_,c_time]
-        save_data(data)
+        save_data(data,name, kind_item, relation_item, money, people, tiket,sub_,c_time)
         save_log(tag = 'add',name=name, c_time=c_time)
 
         st.text(str(sum(data['금액 (만원)']))+ ' 만원')
