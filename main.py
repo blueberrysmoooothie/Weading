@@ -5,16 +5,22 @@ import datetime as dt
 
 def load_data():
     try:
-        data = pd.read_csv('./축의금.csv')
+        data = pd.read_csv('./축의금.csv', encoding = 'euc-kr')
     except:
-        data = pd.DataFrame(columns = ['이름','관계 측','관계','금액 (천원)', '인원','식권','기타','입력시간'])
+        data = pd.DataFrame(columns = ['이름','관계 측','관계','금액 (만원)', '인원','식권','기타','입력시간'])
+    
     return data
 
 def save_data(data):
-    data.to_csv('./축의금.csv', index = False)
+    data.to_csv('./축의금.csv', index = False,encoding = 'euc-kr')
 
 def convert_df(df):
     return df.to_csv().encode('euc-kr')
+
+def save_log(**text):
+    with open('./log_data.txt', 'a') as f:
+        f.write(str(text)+'\n')
+    
 
 
 
@@ -39,14 +45,18 @@ if button_pushed:
     if name != '':
         data.loc[len(data)] = [name, kind_item, relation_item, money, people, tiket,sub_,c_time]
         save_data(data)
+        save_log(tag = 'add',name=name, c_time=c_time)
+
         st.text(str(sum(data['금액 (만원)']))+ ' 만원')
 
 st.dataframe(data)
 
 if len(data):
     csv = convert_df(data)
-    st.download_button('다운로드',csv, file_name = 'weading.csv', mime = 'text/csv')
-
+    
+    d = st.download_button('다운로드',csv, file_name = 'weading.csv', mime = 'text/csv')
+    if d:
+        save_log(tag = 'file down')
 # cam = st.camera_input(label='test_input',disabled=False)
 # if cam:
 #     st.image(cam)
