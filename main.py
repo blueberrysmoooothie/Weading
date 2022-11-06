@@ -95,11 +95,10 @@ if password == "보라돌이":
             #print(data['금액'])
 
     mon = data['금액']
-    peo = data['인원']
-    tic = data['식권']
+    k = data['관계측']
     st.text(f"총합 : {sum([int(m) for m in mon])} 만원")
-    st.text(f"총 인원 : {sum([int(p) for p in peo])} 명")
-    st.text(f"총 식권 : {sum([int(t) for t in tic])} 개")
+    st.text(f"신부 합 : {sum([int(p) for p in mon[k == '신부']])} 만원")
+    st.text(f"부모님 합 : {sum([int(t) for t in mon[k == '부모님']])} 만원")
     st.dataframe(data)
 
     if len(data):
